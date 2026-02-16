@@ -4,10 +4,10 @@
   <link rel="icon" href="/static/images/favicon.ico" type="image/x-icon">
   <meta charset="utf-8">
   <meta name="description"
-        content="KAIROS: TOWARDS ADAPTIVE AND GENERALIZABLE TIME SERIES FOUNDATION MODELS">
+        content="KAIROS: Toward Adaptive and Parameter-Efficient Time Series Foundation Models">
   <meta name="keywords" content="Time Series, Foundation Models, Deep Learning, Forecasting, KAIROS">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Kairos: Towards Adaptive and Generalizable Time Series Foundation Models</title>
+  <title>KAIROS: Toward Adaptive and Parameter-Efficient Time Series Foundation Models</title>
 
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
   <script>
@@ -56,6 +56,11 @@
     .table-container {
       overflow-x: auto;
     }
+    .table.is-centered-content th,
+    .table.is-centered-content td {
+        text-align: center !important;
+        vertical-align: middle !important;
+    }
   </style>
 </head>
 <body>
@@ -65,7 +70,7 @@
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column has-text-centered">
-          <h1 class="title is-1 publication-title"><span class="small-caps">Kairos</span>: Towards Adaptive and Generalizable Time Series Foundation Models</h1>
+          <h1 class="title is-1 publication-title"><span class="small-caps">Kairos</span>: Toward Adaptive and Parameter-Efficient Time Series Foundation Models</h1>
 
           <div class="has-text-centered" style="color: #FF6F00; margin: 0.5rem 0;">
             <h2 class="title is-4" style="color: inherit;">
@@ -150,11 +155,11 @@
                  class="interpolation-image"
                  alt="KAIROS Performance vs Parameters"
                  >
-      <p class="content has-text-centered">
-        (a) shows the trade-off between performance (MASE) and the number of parameters on GIFT-Eval. <span class="small-caps">Kairos</span> series (red) achieves better performance with significantly fewer parameters compared to other models.
-        (b) and (c) highlight the significant variation in information density, both across different datasets and within individual time series.
-        (d) contrasts different tokenization strategies.
-      </p>
+      <div class="content has-text-centered" style="margin-top: 15px;">
+        <p>
+          <strong>Figure 1.</strong> (a) Comparison on the GIFT-Eval benchmark demonstrates that <span class="small-caps">Kairos</span> achieves superior zero-shot forecasting performance (lower normalized MASE) while requiring significantly fewer parameters than existing TSFMs. (b)(c) Significant variation exists in information density (signal complexity) across and within different time series datasets. (d) Unlike existing TSFMs that use point-wise or fixed-size patching, <span class="small-caps">Kairos</span> uses Mixture-of-Size Tokenization to dynamically adapt to information density.
+        </p>
+      </div>
     </div>
   </div>
 </section>
@@ -167,12 +172,12 @@
         <h2 class="title is-3">Abstract</h2>
         <div class="content has-text-justified">
           <p>
-            Time series foundation models (TSFMs) have emerged as a powerful paradigm for time series analysis, driven by large-scale pretraining on diverse data corpora. However, time series inherently exhibit heterogeneous information density over time, influenced by system states and signal complexity, presenting significant modeling challenges especially in a zero-shot scenario. Current TSFMs rely on non-adaptive processing pipelines that fail to capture this dynamic nature. For example, common tokenization strategies such as fixed-size patching enforce rigid observational granularity, limiting their ability to adapt to varying information densities. Similarly, conventional positional encodings impose a uniform temporal scale, making it difficult to model diverse periodicities and trends across series. To overcome these limitations, we propose <span class="small-caps">Kairos</span>, a flexible TSFM framework that integrates a dynamic patching tokenizer and an instance-adaptive positional embedding. <span class="small-caps">Kairos</span> adaptively selects tokenization granularity and tailors positional encodings to the unique characteristics of each time series instance. Trained on a large-scale Predictability-Stratified Time Series (PreSTS) corpus comprising over 300 billion time points and adopting a multi-patch prediction strategy in the inference stage, <span class="small-caps">Kairos</span> achieves superior performance with much fewer parameters on two common zero-shot benchmarks, GIFT-Eval and the Time-Series-Library benchmark, consistently outperforming established methods across diverse tasks.
+            Inherent temporal heterogeneity, such as varying sampling densities and periodic structures, has posed substantial challenges in zero-shot generalization for Time Series Foundation Models (TSFMs). Existing TSFMs predominantly rely on massive parameterization to absorb such heterogeneity, as their static tokenization and positional encoding schemes entangle diverse temporal patterns into a fixed representation space, encouraging memorization rather than adaptation. To address this limitation, we propose <span class="small-caps">Kairos</span>, a flexible and parameter-efficient TSFM that decouples temporal heterogeneity from model capacity through a novel tokenization perspective. <span class="small-caps">Kairos</span> introduces a dynamic patching tokenizer and a mixture-of-size encoding that adapt observational granularity to local information density, enabling fine-grained temporal abstraction without increasing model width or depth. In addition, we design a multi-granularity positional embedding based on dynamic rotary encodings, which conditions on instance-level spectral features and temporal structure induced by dynamic patching tokenization, allowing robust modeling of diverse temporal dependencies. Trained on a novel Predictability-Stratified Time-Series (PreSTS) corpus, <span class="small-caps">Kairos</span> achieves superior zero-shot performance with substantially fewer parameters on two mainstream benchmarks, GIFT-Eval and Time-Series-Library.
           </p>
         </div>
       </div>
     </div>
-    </div>
+  </div>
 </section>
 
 <section class="section">
@@ -182,12 +187,17 @@
         <h2 class="title is-3">Methodology</h2>
         <div class="content has-text-justified">
           <p>
-            The <span class="small-caps">Kairos</span> architecture consists of three main components. First, the input time series is tokenized by a <strong>Mixture-of-Size Dynamic Patching (MoS-DP)</strong> module to extract multi-granularity local information. These embeddings are then processed by a Transformer encoder, which uses our proposed <strong>Instance-Adaptive Rotary Position Embedding (IAROPE)</strong> to model complex temporal relationships. Finally, a Transformer decoder utilizes a multi-patch prediction strategy for forecasting.
+            The <span class="small-caps">Kairos</span> architecture is designed to handle temporal heterogeneity efficiently through three key components:
           </p>
+          <ul>
+            <li><strong>Mixture-of-Size Encoder:</strong> A dynamic patching tokenizer that adaptively models time series at multiple granularities. It uses a Top-K Granularity Router with null experts to sparsely select optimal patch sizes based on local information density.</li>
+            <li><strong>Heterogeneity-Aware Transformer with DRoPE:</strong> The encoder output is processed by a Transformer equipped with Dynamic Rotary Position Embedding (DRoPE). Unlike standard RoPE, DRoPE modulates temporal scales using instance-level spectral features (via FFT) and calibrates positions to account for the varying physical durations of dynamic patches.</li>
+            <li><strong>Multi-Patch Decoder:</strong> To mitigate error accumulation in autoregressive generation, the decoder uses learnable forecast tokens to predict multiple future patches in parallel, offering flexibility for variable-length prediction horizons.</li>
+          </ul>
         </div>
-        <img src="./static/images/method.png" alt="KAIROS Architecture">
-        <p class="content has-text-centered">
-          The overall architecture of <span class="small-caps">Kairos</span>, showing the MoS-DP and IAROPE modules.
+        <img src="./static/images/method.png" alt="KAIROS Architecture" style="margin-top: 20px;">
+        <p class="content has-text-centered" style="font-size: 0.9em; margin-top: 10px;">
+          <strong>Figure 2.</strong> The architecture of <span class="small-caps">Kairos</span>. (i) The Mixture-of-Size Encoder adaptively tokenizes input. (ii) The Heterogeneity-Aware Transformer processes tokens using DRoPE. (iii) The Multi-Patch Decoder predicts future patches in parallel.
         </p>
       </div>
     </div>
@@ -203,7 +213,7 @@
             </p>
         </div>
         <div class="table-container">
-            <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+            <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth is-centered-content" style="font-size: 0.83em;">
                 <thead>
                     <tr>
                         <th rowspan="2" style="vertical-align: middle; text-align: center;">Type</th>
@@ -225,8 +235,8 @@
                         <th style="text-align: center;">Ying.</th>
                         <th style="text-align: center;">Toto</th>
                         <th style="text-align: center;">Sundial</th>
-                        <th style="text-align: center;"><span class="small-caps">Kairos</span> <b>(ours)</b></th>
-                        <th style="text-align: center;"><span class="small-caps">Kairos</span> <b>(ours)</b></th>
+                        <th style="text-align: center;"><span class="small-caps">Kairos</span><sub>s</sub><br>(Ours)</th>
+                        <th style="text-align: center;"><span class="small-caps">Kairos</span><sub>b</sub><br>(Ours)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -245,10 +255,10 @@
                         <td>151M</td>
                         <td>128M</td>
                         <td>23M</td>
-                        <td>50M</td>
+                        <td>53M</td>
                     </tr>
                     <tr>
-                        <th>MASE</th>
+                        <th>MASE &darr;</th>
                         <td>1.000</td>
                         <td>1.061</td>
                         <td>0.849</td>
@@ -262,10 +272,10 @@
                         <td>0.750</td>
                         <td>0.750</td>
                         <td><u>0.748</u></td>
-                        <td><b>0.742</b></td>
+                        <td><b>0.738</b></td>
                     </tr>
                     <tr>
-                        <th>CRPS</th>
+                        <th>CRPS &darr;</th>
                         <td>1.000</td>
                         <td>0.846</td>
                         <td>0.587</td>
@@ -284,6 +294,9 @@
                 </tbody>
             </table>
         </div>
+        <p class="content is-size-7 has-text-grey">
+            Baselines results officially reported by GIFT-Eval. Best results are <b>bolded</b>, second best are <u>underlined</u>.
+        </p>
     </div>
 </section>
 
@@ -300,7 +313,7 @@
           </div>
           <img src="./static/images/tslib-zs.png" alt="TSLib Benchmark Results">
           <p class="content has-text-centered">
-            Zero-shot forecasting performance on TSLib. <span class="small-caps">Kairos</span> (Ours) models consistently achieve the lowest error rates.
+            <strong>Figure 3.</strong> Zero-shot performance on TSLib averaged over prediction lengths {96, 192, 336, 720}. Lower AVG MAE and MSE indicate better performance.
           </p>
         </div>
       </div>
