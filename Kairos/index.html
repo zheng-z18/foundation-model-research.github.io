@@ -191,7 +191,7 @@
           </p>
           <ul>
             <li><strong>Mixture-of-Size Encoder:</strong> A dynamic patching tokenizer that adaptively models time series at multiple granularities. It uses a Top-K Granularity Router with null experts to sparsely select optimal patch sizes based on local information density.</li>
-            <li><strong>Heterogeneity-Aware Transformer with DRoPE:</strong> The encoder output is processed by a Transformer equipped with Dynamic Rotary Position Embedding (DRoPE). Unlike standard RoPE, DRoPE modulates temporal scales using instance-level spectral features (via FFT) and calibrates positions to account for the varying physical durations of dynamic patches.</li>
+            <li><strong>Heterogeneity-Aware Transformer:</strong> The encoder output is processed by a Transformer equipped with Dynamic Rotary Position Embedding (DRoPE). Unlike standard RoPE, DRoPE modulates temporal scales using instance-level spectral features (via FFT) and calibrates positions to account for the varying physical durations of dynamic patches.</li>
             <li><strong>Multi-Patch Decoder:</strong> To mitigate error accumulation in autoregressive generation, the decoder uses learnable forecast tokens to predict multiple future patches in parallel, offering flexibility for variable-length prediction horizons.</li>
           </ul>
         </div>
